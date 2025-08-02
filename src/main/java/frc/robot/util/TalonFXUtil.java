@@ -10,6 +10,7 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Current;
 import edu.wpi.first.units.measure.Temperature;
 import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.Alert;
 
 public class TalonFXUtil {
     public static record MotorInputs(
@@ -30,7 +31,15 @@ public class TalonFXUtil {
         final StatusSignal<Temperature> tempCelsius;
         final StatusSignal<Boolean> tempFault;
 
-        public MotorStatusSignalSet(TalonFX motor) {
+        private Alert connectedAlert;
+
+        public MotorStatusSignalSet(TalonFX motor, String motorName, String Subsystem) {
+            connectedAlert = new Alert(
+                    Subsystem,
+                    motorName + "Motor ID: " + motor.getDeviceID() + "is disconnected on CAN BUS: "
+                            + motor.getNetwork(),
+                    Alert.AlertType.kError);
+            connectedAlert.set(false);
             this.positionRad = motor.getPosition();
             this.velocityRadPerSec = motor.getVelocity();
             this.leftAppliedVoltage = motor.getMotorVoltage();
@@ -44,6 +53,14 @@ public class TalonFXUtil {
             return new BaseStatusSignal[] {
                 positionRad, velocityRadPerSec, leftAppliedVoltage, supplyCurrent, torqueCurrent, tempCelsius, tempFault
             };
+        }
+
+        public void setConnected(boolean connected) {
+            if (connected) {
+                connectedAlert.set(false);
+            } else {
+                connectedAlert.set(true);
+            }
         }
 
         public MotorInputs getMotorInputs() {

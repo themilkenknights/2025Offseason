@@ -10,7 +10,7 @@ import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
-import edu.wpi.first.units.measure.Voltage;
+import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.subsystems.shooter.ShooterConstants.motorConfigs;
 import frc.robot.util.TalonFXUtil.MotorStatusSignalSet;
 import java.util.Arrays;
@@ -25,21 +25,23 @@ public class ShooterIOTalonFX implements ShooterIO {
     private final MotorStatusSignalSet pivotRightSignals;
 
     // Declare motor controllers
-    private final TalonFX talonBottomLeft = new TalonFX(1);
-    private final TalonFX talonBottomRight = new TalonFX(2);
-    private final TalonFX talonTop = new TalonFX(3);
-    private final TalonFX talonFeeder = new TalonFX(4);
-    private final TalonFX talonPivotLeft = new TalonFX(5);
-    private final TalonFX talonPivotRight = new TalonFX(6);
+private final TalonFX talonBottomLeft = new TalonFX(ShooterConstants.bottomLeftShooterMotorId, ShooterConstants.shooterCANBus);
+private final TalonFX talonBottomRight = new TalonFX(ShooterConstants.bottomRightShooterMotorId, ShooterConstants.shooterCANBus);
+private final TalonFX talonTop = new TalonFX(ShooterConstants.topShooterMotorId, ShooterConstants.shooterCANBus);
+private final TalonFX talonFeeder = new TalonFX(ShooterConstants.feederMotorId, ShooterConstants.shooterCANBus);
+private final TalonFX talonPivotLeft = new TalonFX(ShooterConstants.pivotLeftMotorId, ShooterConstants.shooterCANBus);
+private final TalonFX talonPivotRight = new TalonFX(ShooterConstants.pivotRightMotorId, ShooterConstants.shooterCANBus);
+
+    private final DigitalInput beambreak = new DigitalInput(ShooterConstants.beambreakId);
 
     public ShooterIOTalonFX() {
         // Initialize bottom left motor signals
-        bottomLeftSignals = new MotorStatusSignalSet(talonBottomLeft);
-        bottomRightSignals = new MotorStatusSignalSet(talonBottomRight);
-        topSignals = new MotorStatusSignalSet(talonTop);
-        feederSignals = new MotorStatusSignalSet(talonFeeder);
-        pivotLeftSignals = new MotorStatusSignalSet(talonPivotLeft);
-        pivotRightSignals = new MotorStatusSignalSet(talonPivotRight);
+        bottomLeftSignals = new MotorStatusSignalSet(talonBottomLeft, "Bottom Left", "Shooter");
+        bottomRightSignals = new MotorStatusSignalSet(talonBottomRight, "Bottom Right", "Shooter");
+        topSignals = new MotorStatusSignalSet(talonTop, "Top", "Shooter");
+        feederSignals = new MotorStatusSignalSet(talonFeeder, "Feeder", "Shooter");
+        pivotLeftSignals = new MotorStatusSignalSet(talonPivotLeft, "Pivot Left", "Shooter");
+        pivotRightSignals = new MotorStatusSignalSet(talonPivotRight, "Pivot Right", "Shooter");
 
         tryUntilOk(
                 5,
@@ -87,6 +89,14 @@ public class ShooterIOTalonFX implements ShooterIO {
         inputs.pivotRightMotorConnected = BaseStatusSignal.refreshAll(pivotRightSignals.getBaseStatusSignals())
                 .isOK();
 
+        // Update the connected alerts based on motor connection status
+        topSignals.setConnected(inputs.topMotorConnected);
+        bottomLeftSignals.setConnected(inputs.bottomLeftMotorConnected);
+        bottomRightSignals.setConnected(inputs.bottomRightMotorConnected);
+        feederSignals.setConnected(inputs.feederMotorConnected);
+        pivotLeftSignals.setConnected(inputs.pivotLeftMotorConnected);
+        pivotRightSignals.setConnected(inputs.pivotRightMotorConnected);
+
         // Update the inputs with the latest values from the signals
         inputs.topMotorInputs = topSignals.getMotorInputs();
         inputs.bottomLeftMotorInputs = bottomLeftSignals.getMotorInputs();
@@ -94,6 +104,8 @@ public class ShooterIOTalonFX implements ShooterIO {
         inputs.feederMotorInputs = feederSignals.getMotorInputs();
         inputs.pivotLeftMotorInputs = pivotLeftSignals.getMotorInputs();
         inputs.pivotRightMotorInputs = pivotRightSignals.getMotorInputs();
+
+        inputs.beambreak = beambreak.get();
     }
 
     private final VelocityVoltage bottomShooterRequest = new VelocityVoltage(0).withSlot(0);
@@ -107,8 +119,8 @@ public class ShooterIOTalonFX implements ShooterIO {
     private final VoltageOut feederControlRequest = new VoltageOut(0);
 
     @Override
-    public void setFeederSpeed(Voltage speed) {
-        feederControlRequest.withOutput(speed);
+    public void setFeederSpeed(double volts) {
+        feederControlRequest.withOutput(volts);
         talonFeeder.setControl(feederControlRequest);
     }
 
