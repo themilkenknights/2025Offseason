@@ -3,7 +3,6 @@ package frc.robot.subsystems.shooter;
 import static edu.wpi.first.units.Units.*;
 
 import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
@@ -13,7 +12,7 @@ import frc.robot.util.TalonFXUtil.MotorInputs;
 
 public class ShooterIOSim implements ShooterIO {
 
-    private final DigitalInput beambreak = new DigitalInput(ShooterConstants.beambreakId); 
+    private final DigitalInput beambreak = new DigitalInput(ShooterConstants.beambreakId);
 
     private AngularVelocity bottomShooterSpeed = RotationsPerSecond.zero();
     private AngularVelocity topShooterSpeed = RotationsPerSecond.zero();
@@ -24,8 +23,6 @@ public class ShooterIOSim implements ShooterIO {
             new Constraints(
                     3, // ShooterConstants.motorConfigs.shooterMotorConfigs.MotionMagic.MotionMagicCruiseVelocity,
                     3)); // ShooterConstants.motorConfigs.shooterMotorConfigs.MotionMagic.MotionMagicAcceleration));
-
-
 
     @Override
     public void setBottomShooterSpeed(AngularVelocity speed) {
@@ -73,10 +70,10 @@ public class ShooterIOSim implements ShooterIO {
         inputs.pivotRightMotorConnected = true;
 
         // simulate delay in responsiveness of the flywheels using the SlewRateLimiter
-        AngularVelocity bottomShooterMeasuredSpeed =
-                RotationsPerSecond.of(ShooterConstants.bottomWheelLimiter.calculate(bottomShooterSpeed.in(RotationsPerSecond)));
-        AngularVelocity topShooterMeasuredSpeed =
-                RotationsPerSecond.of(ShooterConstants.topWheelLimiter.calculate(topShooterSpeed.in(RotationsPerSecond)));
+        AngularVelocity bottomShooterMeasuredSpeed = RotationsPerSecond.of(
+                ShooterConstants.bottomWheelLimiter.calculate(bottomShooterSpeed.in(RotationsPerSecond)));
+        AngularVelocity topShooterMeasuredSpeed = RotationsPerSecond.of(
+                ShooterConstants.topWheelLimiter.calculate(topShooterSpeed.in(RotationsPerSecond)));
         // pretend the motors are at their setpoints
         inputs.bottomLeftMotorInputs =
                 new MotorInputs(0.0, bottomShooterMeasuredSpeed.in(RadiansPerSecond), 0.0, 0.0, 0.0, 0.0, false);
