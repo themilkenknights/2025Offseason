@@ -32,13 +32,13 @@ public class Shooter extends SubsystemBase {
     }
 
     @AutoLogOutput(key = "Shooter/goalAngle")
-    private Angle goalAngle;
+    private Angle goalAngle = Degrees.of(0); // TODO: make a constant for this
 
     @AutoLogOutput(key = "Shooter/topRollerSpeed")
-    private AngularVelocity topRollerSpeed;
+    private AngularVelocity topRollerSpeed = RotationsPerSecond.of(0);
 
     @AutoLogOutput(key = "Shooter/bottomRollerSpeed")
-    private AngularVelocity bottomRollerSpeed;
+    private AngularVelocity bottomRollerSpeed = RotationsPerSecond.of(0);
 
     private void setShooterGoalAngle(Angle angle) {
         this.goalAngle = angle;
@@ -123,7 +123,7 @@ public class Shooter extends SubsystemBase {
         return goToAngle(Setpoints.Load.getSetpoint())
                 .andThen(startEnd(
                                 () -> {
-                                    io.setFeederSpeed(ShooterConstants.feederSpeedLoading); 
+                                    io.setFeederSpeed(ShooterConstants.feederSpeedLoading);
                                 },
                                 () -> {
                                     io.setFeederSpeed(0);

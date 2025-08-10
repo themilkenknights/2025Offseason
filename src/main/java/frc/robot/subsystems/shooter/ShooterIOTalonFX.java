@@ -25,12 +25,16 @@ public class ShooterIOTalonFX implements ShooterIO {
     private final MotorStatusSignalSet pivotRightSignals;
 
     // Declare motor controllers
-private final TalonFX talonBottomLeft = new TalonFX(ShooterConstants.bottomLeftShooterMotorId, ShooterConstants.shooterCANBus);
-private final TalonFX talonBottomRight = new TalonFX(ShooterConstants.bottomRightShooterMotorId, ShooterConstants.shooterCANBus);
-private final TalonFX talonTop = new TalonFX(ShooterConstants.topShooterMotorId, ShooterConstants.shooterCANBus);
-private final TalonFX talonFeeder = new TalonFX(ShooterConstants.feederMotorId, ShooterConstants.shooterCANBus);
-private final TalonFX talonPivotLeft = new TalonFX(ShooterConstants.pivotLeftMotorId, ShooterConstants.shooterCANBus);
-private final TalonFX talonPivotRight = new TalonFX(ShooterConstants.pivotRightMotorId, ShooterConstants.shooterCANBus);
+    private final TalonFX talonBottomLeft =
+            new TalonFX(ShooterConstants.bottomLeftShooterMotorId, ShooterConstants.shooterCANBus);
+    private final TalonFX talonBottomRight =
+            new TalonFX(ShooterConstants.bottomRightShooterMotorId, ShooterConstants.shooterCANBus);
+    private final TalonFX talonTop = new TalonFX(ShooterConstants.topShooterMotorId, ShooterConstants.shooterCANBus);
+    private final TalonFX talonFeeder = new TalonFX(ShooterConstants.feederMotorId, ShooterConstants.shooterCANBus);
+    private final TalonFX talonPivotLeft =
+            new TalonFX(ShooterConstants.pivotLeftMotorId, ShooterConstants.shooterCANBus);
+    private final TalonFX talonPivotRight =
+            new TalonFX(ShooterConstants.pivotRightMotorId, ShooterConstants.shooterCANBus);
 
     private final DigitalInput beambreak = new DigitalInput(ShooterConstants.beambreakId);
 
