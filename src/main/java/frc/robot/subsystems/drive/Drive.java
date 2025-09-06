@@ -107,7 +107,8 @@ public class Drive extends SubsystemBase implements Vision.VisionConsumer {
                     Volts.of(TunerConstants.FrontLeft.SteerFrictionVoltage),
                     Meters.of(TunerConstants.FrontLeft.WheelRadius),
                     KilogramSquareMeters.of(TunerConstants.FrontLeft.SteerInertia),
-                    WHEEL_COF));
+                    WHEEL_COF))
+            .withBumperSize(Inches.of(33), Inches.of(31));
 
     static final Lock odometryLock = new ReentrantLock();
     private final GyroIO gyroIO;

@@ -5,7 +5,6 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
@@ -21,8 +20,6 @@ public class Shooter extends SubsystemBase {
 
     public Shooter(ShooterIO io) {
         this.io = io;
-        this.setDefaultCommand(
-                new SequentialCommandGroup(loadCoral(), shoot(Setpoints.L4.getSetpoint()), new WaitCommand(2)));
     }
 
     @Override
@@ -35,10 +32,10 @@ public class Shooter extends SubsystemBase {
     private Angle goalAngle;
 
     @AutoLogOutput(key = "Shooter/topRollerSpeed")
-    private AngularVelocity topRollerSpeed;
+    private AngularVelocity topRollerSpeed = RotationsPerSecond.of(0);
 
     @AutoLogOutput(key = "Shooter/bottomRollerSpeed")
-    private AngularVelocity bottomRollerSpeed;
+    private AngularVelocity bottomRollerSpeed = RotationsPerSecond.of(0);
 
     private void setShooterGoalAngle(Angle angle) {
         this.goalAngle = angle;
@@ -59,6 +56,10 @@ public class Shooter extends SubsystemBase {
     public boolean atPivotSetpoint() {
         return Radians.of(inputs.pivotLeftMotorInputs.positionRads())
                 .isNear(goalAngle, ShooterConstants.pivotTolerance);
+    }
+
+    public Angle getPivotAngle() {
+        return Radians.of(-inputs.pivotLeftMotorInputs.positionRads());
     }
 
     @AutoLogOutput(key = "Shooter/topRollerAtSetpoint")
@@ -119,11 +120,15 @@ public class Shooter extends SubsystemBase {
                                 .andThen(new WaitCommand(ShooterConstants.shootingTime))));
     }
 
+    public Command goToLoadingSetpoint() {
+        return goToAngle(Setpoints.Load.getSetpoint());
+    }
+
     public Command loadCoral() {
         return goToAngle(Setpoints.Load.getSetpoint())
                 .andThen(startEnd(
                                 () -> {
-                                    io.setFeederSpeed(ShooterConstants.feederSpeedLoading); 
+                                    io.setFeederSpeed(ShooterConstants.feederSpeedLoading);
                                 },
                                 () -> {
                                     io.setFeederSpeed(0);
