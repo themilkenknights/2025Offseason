@@ -30,7 +30,8 @@ public class ModuleIOTalonFXReal extends ModuleIOTalonFX {
     private final Queue<Double> drivePositionQueue;
     private final Queue<Double> turnPositionQueue;
 
-    public ModuleIOTalonFXReal(SwerveModuleConstants constants) {
+    @SuppressWarnings("unchecked")
+    public ModuleIOTalonFXReal(@SuppressWarnings("rawtypes") SwerveModuleConstants constants) {
         super(constants);
 
         this.timestampQueue = PhoenixOdometryThread.getInstance().makeTimestampQueue();

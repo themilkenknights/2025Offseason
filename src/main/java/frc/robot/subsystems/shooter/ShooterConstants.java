@@ -40,9 +40,10 @@ public class ShooterConstants {
     public static enum Setpoints {
         Load(new Setpoint(Degrees.of(30), RotationsPerSecond.of(0), RotationsPerSecond.of(0))),
         L1(new Setpoint(Degrees.of(40), RotationsPerSecond.of(1000), RotationsPerSecond.of(1500))),
-        L2(new Setpoint(Degrees.of(60), RotationsPerSecond.of(50), RotationsPerSecond.of(2000))),
-        L3(new Setpoint(Degrees.of(90), RotationsPerSecond.of(1500), RotationsPerSecond.of(3000))),
-        L4(new Setpoint(Degrees.of(135), RotationsPerSecond.of(2000), RotationsPerSecond.of(4000)));
+        L2(new Setpoint(Degrees.of(50), RotationsPerSecond.of(50), RotationsPerSecond.of(2000))),
+        L3(new Setpoint(Degrees.of(60), RotationsPerSecond.of(1500), RotationsPerSecond.of(3000))),
+        L4(new Setpoint(Degrees.of(70), RotationsPerSecond.of(2000), RotationsPerSecond.of(4000)));
+
 
         private final Setpoint setpoint;
 

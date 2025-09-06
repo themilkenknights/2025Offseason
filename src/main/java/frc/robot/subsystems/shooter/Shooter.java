@@ -5,7 +5,6 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
@@ -21,8 +20,6 @@ public class Shooter extends SubsystemBase {
 
     public Shooter(ShooterIO io) {
         this.io = io;
-        this.setDefaultCommand(
-                new SequentialCommandGroup(loadCoral(), shoot(Setpoints.L4.getSetpoint()), new WaitCommand(2)));
     }
 
     @Override
@@ -59,6 +56,10 @@ public class Shooter extends SubsystemBase {
     public boolean atPivotSetpoint() {
         return Radians.of(inputs.pivotLeftMotorInputs.positionRads())
                 .isNear(goalAngle, ShooterConstants.pivotTolerance);
+    }
+
+    public Angle getPivotAngle() {
+        return Radians.of(-inputs.pivotLeftMotorInputs.positionRads());
     }
 
     @AutoLogOutput(key = "Shooter/topRollerAtSetpoint")
@@ -117,6 +118,10 @@ public class Shooter extends SubsystemBase {
                                     return !getBeambreak();
                                 })
                                 .andThen(new WaitCommand(ShooterConstants.shootingTime))));
+    }
+
+    public Command goToLoadingSetpoint() {
+        return goToAngle(Setpoints.Load.getSetpoint());
     }
 
     public Command loadCoral() {

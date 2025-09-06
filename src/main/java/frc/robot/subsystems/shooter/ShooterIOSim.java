@@ -9,10 +9,20 @@ import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Voltage;
 import edu.wpi.first.wpilibj.DigitalInput;
 import frc.robot.util.TalonFXUtil.MotorInputs;
+import java.util.function.BooleanSupplier;
 
 public class ShooterIOSim implements ShooterIO {
 
     private final DigitalInput beambreak = new DigitalInput(ShooterConstants.beambreakId);
+
+
+    private final BooleanSupplier obtainGamePiece;
+
+    public ShooterIOSim(BooleanSupplier obtainGamePiece) {
+        this.obtainGamePiece = obtainGamePiece;
+    }
+
+    private boolean hasCoral = false;
 
     private AngularVelocity bottomShooterSpeed = RotationsPerSecond.zero();
     private AngularVelocity topShooterSpeed = RotationsPerSecond.zero();
@@ -56,6 +66,12 @@ public class ShooterIOSim implements ShooterIO {
 
     @Override
     public void updateInputs(ShooterIOInputs inputs) {
+        // maplesim stuff
+        if (feederSpeed.in(Volts) > 0 && !hasCoral) {
+            hasCoral = obtainGamePiece.getAsBoolean();
+        }
+        inputs.beambreak = !hasCoral;
+
         // run the fake PID controller to simulate the pivot motor and simulator
         pivotDummyController.calculate(currentAngle.in(Rotation));
 
@@ -85,7 +101,5 @@ public class ShooterIOSim implements ShooterIO {
         inputs.pivotRightMotorInputs = new MotorInputs(currentAngle.in(Radians), 0.0, 0.0, 0.0, 0.0, 0.0, false);
         inputs.pivotLeftMotorInputs = new MotorInputs(currentAngle.in(Radians), 0.0, 0.0, 0.0, 0.0, 0.0, false);
         inputs.feederMotorInputs = new MotorInputs(0.0, 0.0, feederSpeed.in(Volts), 0.0, 0.0, 0.0, false);
-
-        inputs.beambreak = beambreak.get();
     }
 }
