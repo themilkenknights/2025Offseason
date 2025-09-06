@@ -29,7 +29,7 @@ public class Shooter extends SubsystemBase {
     }
 
     @AutoLogOutput(key = "Shooter/goalAngle")
-    private Angle goalAngle;
+    private Angle goalAngle = Degrees.of(0); // TODO: make a constant for this
 
     @AutoLogOutput(key = "Shooter/topRollerSpeed")
     private AngularVelocity topRollerSpeed = RotationsPerSecond.of(0);

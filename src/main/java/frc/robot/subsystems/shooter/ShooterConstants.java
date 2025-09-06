@@ -44,6 +44,7 @@ public class ShooterConstants {
         L3(new Setpoint(Degrees.of(60), RotationsPerSecond.of(1500), RotationsPerSecond.of(3000))),
         L4(new Setpoint(Degrees.of(70), RotationsPerSecond.of(2000), RotationsPerSecond.of(4000)));
 
+
         private final Setpoint setpoint;
 
         Setpoints(Setpoint setpoint) {

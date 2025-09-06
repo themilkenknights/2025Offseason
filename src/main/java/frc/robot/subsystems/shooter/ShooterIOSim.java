@@ -15,6 +15,7 @@ public class ShooterIOSim implements ShooterIO {
 
     private final DigitalInput beambreak = new DigitalInput(ShooterConstants.beambreakId);
 
+
     private final BooleanSupplier obtainGamePiece;
 
     public ShooterIOSim(BooleanSupplier obtainGamePiece) {
