@@ -26,6 +26,10 @@ public class Intake extends SubsystemBase {
         return Radians.of(inputs.pivotMotorInputs.positionRads()).isNear(goalAngle, IntakeConstants.pivotTolerance);
     }
 
+    public Angle getCurrentAngle() {
+        return Radians.of(inputs.pivotMotorInputs.positionRads());
+    }
+
     public Intake(IntakeIO io) {
         this.io = io;
     }
