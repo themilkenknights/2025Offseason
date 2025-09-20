@@ -15,6 +15,8 @@ import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.drive.Drive;
+import frc.robot.util.Dashboard;
+import frc.robot.util.Dashboard.reefPosition;
 import frc.robot.util.FieldConstants;
 import org.littletonrobotics.junction.Logger;
 
@@ -31,13 +33,20 @@ public class AutoPilotDriveCommands {
         // Prevent instantiation
     }
 
+    public static Command autopilotGoToShootFromPose(Drive drive, reefPosition position) {
+        return autopilotDriveCommand(
+                new APTarget(Dashboard.getPoseFromReefPosition(position))
+                        .withEntryAngle(drive.getPose().getRotation()),
+                drive);
+    }
+
     public static Command testDriveCommand(Drive drive) {
 
         return autopilotDriveCommand(
                 new APTarget(new Pose2d(3, 2, new Rotation2d())).withEntryAngle(Rotation2d.k180deg), drive);
     }
 
-    public static Command goToNearistShootFromPose(Drive drive) {
+    public static Command goToNearestShootFromPose(Drive drive) {
         return drive.defer(() -> {
             return autopilotDriveCommand(
                     new APTarget(FieldConstants.getClosestShootFromPose(drive.getPose()))
@@ -58,8 +67,6 @@ public class AutoPilotDriveCommands {
         angleController.enableContinuousInput(-Math.PI, Math.PI);
 
         return drive.run(() -> {
-                    ChassisSpeeds speeds = drive.getFieldRelativeSpeeds();
-                    Translation2d velocity = new Translation2d(speeds.vxMetersPerSecond, speeds.vyMetersPerSecond);
                     Pose2d pose = drive.getPose();
                     APResult output = autopilot.calculate(pose, drive.getChassisSpeeds(), goal);
 
@@ -75,6 +82,7 @@ public class AutoPilotDriveCommands {
                     Logger.recordOutput("Autodrive/goalPose", goal.getReference());
                 })
                 .until(() -> autopilot.atTarget(drive.getPose(), goal))
-                .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()));
+                .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()))
+                .andThen(() -> drive.stop());
     }
 }

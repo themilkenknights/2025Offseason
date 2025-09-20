@@ -24,7 +24,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.commands.AutoPilotDriveCommands;
+import frc.robot.commands.AutoScoreCommand;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.FeederCommands;
 import frc.robot.generated.TunerConstants;
@@ -39,6 +39,7 @@ import frc.robot.subsystems.shooter.ShooterIO;
 import frc.robot.subsystems.shooter.ShooterIOSim;
 import frc.robot.subsystems.shooter.ShooterIOTalonFX;
 import frc.robot.subsystems.vision.*;
+import frc.robot.util.Dashboard;
 import frc.robot.util.RobotVisualization;
 import org.ironmaple.simulation.SimulatedArena;
 import org.ironmaple.simulation.drivesims.SwerveDriveSimulation;
@@ -59,6 +60,9 @@ public class RobotContainer {
 
     @SuppressWarnings("unused")
     private final RobotVisualization robotVisualization;
+
+    @SuppressWarnings("unused")
+    private final Dashboard dashboard;
 
     private final Shooter shooter;
 
@@ -137,6 +141,8 @@ public class RobotContainer {
         }
         // set up robot visualization
         robotVisualization = new RobotVisualization(shooter::getPivotAngle);
+        // set up dashboard
+        dashboard = new Dashboard(drive::getPose);
 
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
@@ -190,10 +196,12 @@ public class RobotContainer {
         driverController.start().onTrue(Commands.runOnce(resetGyro, drive).ignoringDisable(true));
 
         // testing the intake
-        driverController.leftTrigger().onTrue(intake.intakeCoral());
-        driverController.rightTrigger().onTrue(shooter.shoot(ShooterConstants.Setpoints.L4.getSetpoint()));
-        driverController.leftBumper().onTrue(FeederCommands.feed(intake, shooter));
-
+        driverController.leftTrigger().onTrue(intake.intakeCoral().andThen(FeederCommands.feed(intake, shooter)));
+        driverController.rightBumper().onTrue(shooter.shoot(ShooterConstants.Setpoints.L4.getSetpoint()));
+        driverController
+                .rightTrigger()
+                .whileTrue(Commands.deferredProxy(
+                        () -> AutoScoreCommand.AutoScore(Dashboard.getSelectedTarget(), drive, shooter)));
     }
 
     /**
