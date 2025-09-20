@@ -26,8 +26,10 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.autos.AutopilotAutos;
 import frc.robot.commands.AutoScoreCommand;
+
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.FeederCommands;
+import frc.robot.commands.ObjectDetectionDriveCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.intake.Intake;
@@ -58,6 +60,9 @@ public class RobotContainer {
 
     @SuppressWarnings("unused")
     private final Vision vision;
+
+    @SuppressWarnings("unused")
+    private final ObjectDetection objectDetection;
 
     @SuppressWarnings("unused")
     private final RobotVisualization robotVisualization;
@@ -95,7 +100,8 @@ public class RobotContainer {
                         new VisionIOLimelight(VisionConstants.camera1Name, drive::getRotation));
                 shooter = new Shooter(new ShooterIOTalonFX());
                 intake = new Intake(new IntakeIOTalonFX());
-
+                objectDetection = new ObjectDetection(
+                        new ObjectDetectionIOPhoton(cameraObjectDetectionName, robotToCameraIntake));
                 break;
             case SIM:
                 // Sim robot, instantiate physics sim IO implementations
@@ -123,7 +129,8 @@ public class RobotContainer {
                 IntakeIOSim intakeIOSim = new IntakeIOSim(driveSimulation);
                 intake = new Intake(intakeIOSim);
                 shooter = new Shooter(new ShooterIOSim(intakeIOSim::obtainGamePiece));
-
+                objectDetection = new ObjectDetection(new ObjectDetectionIOSim(
+                        cameraObjectDetectionName, robotToCameraIntake, driveSimulation::getSimulatedDriveTrainPose));
                 break;
 
             default:
@@ -138,6 +145,7 @@ public class RobotContainer {
                 vision = new Vision(drive, new VisionIO() {}, new VisionIO() {});
                 shooter = new Shooter(new ShooterIO() {});
                 intake = new Intake(new IntakeIO() {});
+                objectDetection = new ObjectDetection(new ObjectDetectionIO() {});
                 break;
         }
         // set up robot visualization
