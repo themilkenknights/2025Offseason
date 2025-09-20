@@ -14,7 +14,7 @@ public class Intake extends SubsystemBase {
     private final IntakeIOInputsAutoLogged inputs = new IntakeIOInputsAutoLogged();
 
     @AutoLogOutput(key = "Intake/goalAngle")
-    private Angle goalAngle;
+    private Angle goalAngle = Degrees.zero();
 
     private void setGoalAngle(Angle angle) {
         this.goalAngle = angle;

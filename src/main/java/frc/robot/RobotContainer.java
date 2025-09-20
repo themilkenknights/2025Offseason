@@ -24,9 +24,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import frc.robot.commands.AutoPilotDriveCommands;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.FeederCommands;
+import frc.robot.commands.ObjectDetectionDriveCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.intake.Intake;
@@ -56,6 +56,9 @@ public class RobotContainer {
 
     @SuppressWarnings("unused")
     private final Vision vision;
+
+    @SuppressWarnings("unused")
+    private final ObjectDetection objectDetection;
 
     @SuppressWarnings("unused")
     private final RobotVisualization robotVisualization;
@@ -90,7 +93,8 @@ public class RobotContainer {
                         new VisionIOLimelight(VisionConstants.camera1Name, drive::getRotation));
                 shooter = new Shooter(new ShooterIOTalonFX());
                 intake = new Intake(new IntakeIOTalonFX());
-
+                objectDetection = new ObjectDetection(
+                        new ObjectDetectionIOPhoton(cameraObjectDetectionName, robotToCameraIntake));
                 break;
             case SIM:
                 // Sim robot, instantiate physics sim IO implementations
@@ -118,7 +122,8 @@ public class RobotContainer {
                 IntakeIOSim intakeIOSim = new IntakeIOSim(driveSimulation);
                 intake = new Intake(intakeIOSim);
                 shooter = new Shooter(new ShooterIOSim(intakeIOSim::obtainGamePiece));
-
+                objectDetection = new ObjectDetection(new ObjectDetectionIOSim(
+                        cameraObjectDetectionName, robotToCameraIntake, driveSimulation::getSimulatedDriveTrainPose));
                 break;
 
             default:
@@ -133,6 +138,7 @@ public class RobotContainer {
                 vision = new Vision(drive, new VisionIO() {}, new VisionIO() {});
                 shooter = new Shooter(new ShooterIO() {});
                 intake = new Intake(new IntakeIO() {});
+                objectDetection = new ObjectDetection(new ObjectDetectionIO() {});
                 break;
         }
         // set up robot visualization
@@ -193,7 +199,10 @@ public class RobotContainer {
         driverController.leftTrigger().onTrue(intake.intakeCoral());
         driverController.rightTrigger().onTrue(shooter.shoot(ShooterConstants.Setpoints.L4.getSetpoint()));
         driverController.leftBumper().onTrue(FeederCommands.feed(intake, shooter));
-
+        driverController
+                .rightBumper()
+                .whileTrue(ObjectDetectionDriveCommands.autoIntake(
+                        drive, intake, () -> objectDetection.getBestTarget(), objectDetection::hasTarget));
     }
 
     /**
