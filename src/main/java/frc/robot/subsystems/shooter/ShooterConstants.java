@@ -10,6 +10,7 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.units.measure.*;
+import frc.robot.util.Dashboard.Level;
 
 public class ShooterConstants {
 
@@ -53,6 +54,15 @@ public class ShooterConstants {
         public Setpoint getSetpoint() {
             return setpoint;
         }
+    }
+
+    public static Setpoint getSetpointFromLevel(Level level) {
+        return switch (level) {
+            case L1 -> Setpoints.L1.getSetpoint();
+            case L2 -> Setpoints.L2.getSetpoint();
+            case L3 -> Setpoints.L3.getSetpoint();
+            case L4 -> Setpoints.L4.getSetpoint();
+        };
     }
 
     public static record Setpoint(Angle pivotAngle, AngularVelocity bottomWheelSpeed, AngularVelocity topWheelSpeed) {}

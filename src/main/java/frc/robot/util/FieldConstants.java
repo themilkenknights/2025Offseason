@@ -28,12 +28,16 @@ public class FieldConstants {
 
     public static final Distance shootFromOffset = Inches.of(30);
 
-    public static final Pose2d reefCenterPointOnField =
-            new Pose2d(reefSideWidth.div(2).plus(reefToAllianceWall), fieldSideWallToReefCenter, Rotation2d.k180deg);
+    public static Pose2d reefCenterPointOnField;
+
+    static {
+        reefCenterPointOnField = new Pose2d(
+                reefSideWidth.div(2).plus(reefToAllianceWall), fieldSideWallToReefCenter, Rotation2d.k180deg);
+    }
 
     public static final Distance reefPoleCenterToCenter = Centimeters.of(33.02);
 
-    public static enum reefPositions {
+    private static enum reefPositions {
         A(1),
         B(2),
         C(3),
