@@ -26,7 +26,6 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.autos.AutopilotAutos;
 import frc.robot.commands.AutoScoreCommand;
-
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.FeederCommands;
 import frc.robot.commands.ObjectDetectionDriveCommands;
@@ -209,6 +208,10 @@ public class RobotContainer {
         // testing the intake
         driverController.leftTrigger().onTrue(intake.intakeCoral().andThen(FeederCommands.feed(intake, shooter)));
         driverController.rightBumper().onTrue(shooter.shoot(ShooterConstants.Setpoints.L4.getSetpoint()));
+        driverController
+                .leftBumper()
+                .whileTrue(ObjectDetectionDriveCommands.autoIntake(
+                        drive, intake, objectDetection::getBestTarget, objectDetection::hasTarget));
         driverController
                 .rightTrigger()
                 .whileTrue(Commands.deferredProxy(

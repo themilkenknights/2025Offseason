@@ -37,10 +37,18 @@ public class ObjectDetectionDriveCommands {
                                 return;
                             }
                             // pid.setP((Math.abs(getCenterY(target.get()) - 640) * 0.01));
+                            pid.setP(calculateTargetingP(getCenterY(target.get())));
                             drive.runVelocity(
                                     new ChassisSpeeds(0, 0, pid.calculate(getCenterX(target.get()), 640 / 2)));
                         })
                         .until(pid::atSetpoint));
+    }
+
+    private static final double m = 0.015 / -640;
+
+    private static double calculateTargetingP(double y) {
+
+        return (m * y) + 0.02;
     }
 
     public static Command autoIntake(
@@ -49,6 +57,7 @@ public class ObjectDetectionDriveCommands {
         pid.setTolerance(CENTER_TARGET_TOLERANCE);
         return centerTarget(drive, target, hasTarget)
                 .andThen(drive.run(() -> {
+                            pid.setP(calculateTargetingP(getCenterY(target.get())));
                             drive.runVelocity(
                                     new ChassisSpeeds(-0.5, 0, pid.calculate(getCenterX(target.get()), 640 / 2)));
                         })

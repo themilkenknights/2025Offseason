@@ -41,15 +41,25 @@ public class ObjectDetectionIOSim extends ObjectDetectionIOPhoton {
         super.updateInputs(inputs);
 
         visionSim.clearVisionTargets();
-        SimulatedArena.getInstance().getGamePiecesByType("Coral").forEach(pose -> {
+        SimulatedArena.getInstance().getGamePiecesByType("Coral").forEach(object -> {
             visionSim.addVisionTargets(
                     "Coral",
                     new VisionTargetSim(
-                            pose,
+                            object.getPose3d(),
                             new TargetModel(
                                     Inches.of(11.75).in(Meters),
                                     Inches.of(4.5).in(Meters),
                                     Inches.of(4.5).in(Meters))));
+        });
+        SimulatedArena.getInstance().getGamePiecesByType("CoralAlgaeStack").forEach(object -> {
+            visionSim.addVisionTargets(
+                    "Coral",
+                    new VisionTargetSim(
+                            object.getPose3d(),
+                            new TargetModel(
+                                    Inches.of(4.5).in(Meters),
+                                    Inches.of(4.5).in(Meters),
+                                    Inches.of(11.75).in(Meters))));
         });
 
         visionSim.update(poseSupplier.get());
