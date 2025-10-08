@@ -11,7 +11,9 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.units.measure.*;
+import frc.robot.Constants;
 import frc.robot.util.Dashboard.Level;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class ShooterConstants {
 
@@ -39,6 +41,17 @@ public class ShooterConstants {
     public static final SlewRateLimiter bottomWheelLimiter = new SlewRateLimiter(6000); // Rps
     public static final SlewRateLimiter topWheelLimiter = new SlewRateLimiter(6000); // for sim
 
+    private static final double defaultPassthroughWaitTimeSeconds = 0.2;
+
+    private static final LoggedNetworkNumber passthroughWaitTimeSeconds =
+            new LoggedNetworkNumber("/Tuning/Shooter/PassthroughWaitTimeSeconds", defaultPassthroughWaitTimeSeconds);
+
+    public static Time getPassthroughWaitTime() {
+        return Constants.enableNTTuning
+                ? Seconds.of(passthroughWaitTimeSeconds.get())
+                : Seconds.of(defaultPassthroughWaitTimeSeconds);
+    }
+
     public static enum Setpoints {
         Load(new Setpoint(
                 Degrees.of(15), RotationsPerSecond.of(0), RotationsPerSecond.of(0))), // negate what it should be in cad
@@ -49,12 +62,29 @@ public class ShooterConstants {
 
         private final Setpoint setpoint;
 
+        private final LoggedNetworkNumber angleDeg;
+        private final LoggedNetworkNumber topRotationsPerSecond;
+        private final LoggedNetworkNumber bottomRotationsPerSecond;
+
         Setpoints(Setpoint setpoint) {
             this.setpoint = setpoint;
+            this.angleDeg = new LoggedNetworkNumber(
+                    "/Tuning/Shooter/" + this.name() + "/AngleDeg", this.setpoint.pivotAngle.in(Degrees));
+            this.topRotationsPerSecond = new LoggedNetworkNumber(
+                    "/Tuning/Shooter/" + this.name() + "/TopRotationsPerSecond",
+                    this.setpoint.topWheelSpeed.in(RotationsPerSecond));
+            this.bottomRotationsPerSecond = new LoggedNetworkNumber(
+                    "/Tuning/Shooter/" + this.name() + "/BottomRotationsPerSecond",
+                    this.setpoint.bottomWheelSpeed.in(RotationsPerSecond));
         }
 
         public Setpoint getSetpoint() {
-            return setpoint;
+            return (Constants.enableNTTuning)
+                    ? new Setpoint(
+                            Degrees.of(angleDeg.get()),
+                            RotationsPerSecond.of(bottomRotationsPerSecond.get()),
+                            RotationsPerSecond.of(topRotationsPerSecond.get()))
+                    : this.setpoint;
         }
     }
 
