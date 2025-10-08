@@ -12,15 +12,13 @@ public interface ShooterIO {
         public MotorInputs topMotorInputs = new MotorInputs(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false);
         public MotorInputs feederMotorInputs = new MotorInputs(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false);
         // Rotations after the gearing (ex the actual position of the shooter)
-        public MotorInputs pivotLeftMotorInputs = new MotorInputs(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false);
-        public MotorInputs pivotRightMotorInputs = new MotorInputs(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false);
+        public MotorInputs pivotMotorInputs = new MotorInputs(0.0, 0.0, 0.0, 0.0, 0.0, 0.0, false);
 
         public boolean bottomLeftMotorConnected = false;
         public boolean bottomRightMotorConnected = false;
         public boolean topMotorConnected = false;
         public boolean feederMotorConnected = false;
-        public boolean pivotLeftMotorConnected = false;
-        public boolean pivotRightMotorConnected = false;
+        public boolean pivotMotorConnected = false;
 
         public boolean beambreak = false;
     }
