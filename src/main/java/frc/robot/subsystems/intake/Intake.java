@@ -23,7 +23,8 @@ public class Intake extends SubsystemBase {
 
     @AutoLogOutput(key = "Intake/atGoalAngle")
     public boolean atPivotSetpoint() {
-        return Radians.of(inputs.pivotMotorInputs.positionRads()).isNear(goalAngle, IntakeConstants.pivotTolerance);
+        return Radians.of(inputs.pivotMotorInputs.positionRads())
+                .isNear(goalAngle, IntakeConstants.getPivotTolerance());
     }
 
     public Angle getCurrentAngle() {
@@ -49,7 +50,7 @@ public class Intake extends SubsystemBase {
     }
 
     public Command intakeCoral() {
-        return goToPivotSetpoint(IntakeConstants.pivotExtendedAngle)
+        return defer(() -> goToPivotSetpoint(IntakeConstants.getPivotExtendedAngle()))
                 .andThen(startEnd(
                                 () -> {
                                     io.setFrontRollerSpeed(IntakeConstants.intakeingVoltage);
@@ -72,7 +73,7 @@ public class Intake extends SubsystemBase {
      * @return A {@link Command} that executes the feeding sequence.
      */
     public Command feedCoral() {
-        return goToPivotSetpoint(IntakeConstants.pivotFeedingAngle)
+        return defer(() -> goToPivotSetpoint(IntakeConstants.getPivotFeedingAngle()))
                 .andThen(startEnd(
                         () -> {
                             io.setIndexerSpeed(IntakeConstants.feedingVoltage);
@@ -90,10 +91,10 @@ public class Intake extends SubsystemBase {
      * @return A command that performs the stowing operation.
      */
     public Command stow() {
-        return runOnce(() -> {
-            setGoalAngle(IntakeConstants.pivotStowedAngle);
+        return defer(() -> runOnce(() -> {
+            setGoalAngle(IntakeConstants.getPivotStowedAngle());
             io.setFrontRollerSpeed(0);
             io.setIndexerSpeed(0);
-        });
+        }));
     }
 }

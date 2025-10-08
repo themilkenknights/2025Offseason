@@ -14,8 +14,8 @@ public class AutopilotAutos {
 
         return Commands.deferredProxy(() -> new SequentialCommandGroup(
                 AutoPilotDriveCommands.autopilotGoToShootFromPose(drive, Dashboard.reefPosition.H)
-                        .deadlineFor(shooter.prepareShot(ShooterConstants.Setpoints.L4.getSetpoint())),
+                        .deadlineFor(shooter.prepareShot(ShooterConstants.Setpoints.L4)),
                 Commands.print("Arrived at shooting position, shooting now"),
-                shooter.shoot(ShooterConstants.Setpoints.L4.getSetpoint())));
+                shooter.shoot(ShooterConstants.Setpoints.L4)));
     }
 }

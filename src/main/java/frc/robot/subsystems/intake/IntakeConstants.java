@@ -9,6 +9,8 @@ import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import edu.wpi.first.units.measure.*;
+import frc.robot.Constants;
+import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class IntakeConstants {
     public static final CANBus intakeCANBus = new CANBus("rio");
@@ -22,13 +24,36 @@ public class IntakeConstants {
     public static final double intakeingVoltage = 12;
     public static final double feedingVoltage = -12;
 
-    public static final Angle pivotStowedAngle = Degrees.of(90); // TODO: make actual values
+    private static final Angle pivotStowedAngle = Degrees.of(90);
+    private static final Angle pivotExtendedAngle = Degrees.of(0);
+    private static final Angle pivotFeedingAngle = Degrees.of(160);
+    private static final Angle pivotTolerance = Degrees.of(1);
 
-    public static final Angle pivotExtendedAngle = Degrees.of(0);
+    private static final LoggedNetworkNumber pivotStowedAngleDeg =
+            new LoggedNetworkNumber("/Tuning/Intake/PivotStowedAngleDeg", pivotStowedAngle.in(Degrees));
 
-    public static final Angle pivotFeedingAngle = Degrees.of(160);
+    private static final LoggedNetworkNumber pivotExtendedAngleDeg =
+            new LoggedNetworkNumber("/Tuning/Intake/PivotExtendedAngleDeg", pivotExtendedAngle.in(Degrees));
+    private static final LoggedNetworkNumber pivotFeedingAngleDeg =
+            new LoggedNetworkNumber("/Tuning/Intake/PivotFeedingAngleDeg", pivotFeedingAngle.in(Degrees));
+    private static final LoggedNetworkNumber pivotToleranceDeg =
+            new LoggedNetworkNumber("/Tuning/Intake/PivotToleranceDeg", pivotTolerance.in(Degrees));
 
-    public static final Angle pivotTolerance = Degrees.of(1);
+    public static Angle getPivotExtendedAngle() {
+        return Constants.enableNTTuning ? Degrees.of(pivotExtendedAngleDeg.get()) : pivotExtendedAngle;
+    }
+
+    public static Angle getPivotFeedingAngle() {
+        return Constants.enableNTTuning ? Degrees.of(pivotFeedingAngleDeg.get()) : pivotFeedingAngle;
+    }
+
+    public static Angle getPivotTolerance() {
+        return Constants.enableNTTuning ? Degrees.of(pivotToleranceDeg.get()) : pivotTolerance;
+    }
+
+    public static Angle getPivotStowedAngle() {
+        return Constants.enableNTTuning ? Degrees.of(pivotStowedAngleDeg.get()) : pivotStowedAngle;
+    }
 
     public static class motorConfigs {
         public static final TalonFXConfiguration indexerMotor = new TalonFXConfiguration()

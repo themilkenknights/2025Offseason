@@ -5,6 +5,7 @@ import static edu.wpi.first.units.Units.*;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
@@ -80,17 +81,25 @@ public class Shooter extends SubsystemBase {
         return atPivotSetpoint() && atTopRollerSetpoint() && atBottomRollerSetpoint();
     }
 
-    public Command goToAngle(Setpoint goal) {
+    private Command goToAngle(Setpoint goal) {
         return runOnce(() -> setShooterGoalAngle(goal.pivotAngle()))
                 .andThen(new WaitUntilCommand(this::atPivotSetpoint));
     }
 
-    public Command rampUp(Setpoint goal) {
+    public Command goToAngle(Setpoints goal) {
+        return defer(() -> goToAngle(goal.getSetpoint()));
+    }
+
+    private Command rampUp(Setpoint goal) {
         return runOnce(() -> {
                     setTopRollerSpeed(goal.topWheelSpeed());
                     setBottomRollerSpeed(goal.bottomWheelSpeed());
                 })
                 .andThen(new WaitUntilCommand(() -> (atTopRollerSetpoint() && atBottomRollerSetpoint())));
+    }
+
+    public Command rampUp(Setpoints goal) {
+        return defer(() -> rampUp(goal.getSetpoint()));
     }
 
     public Command prepareShot(Setpoint goal) {
@@ -100,6 +109,10 @@ public class Shooter extends SubsystemBase {
                     setShooterGoalAngle(goal.pivotAngle());
                 })
                 .andThen(new WaitUntilCommand(this::readyToShoot));
+    }
+
+    public Command prepareShot(Setpoints goal) {
+        return defer(() -> prepareShot(goal.getSetpoint()));
     }
 
     public Command shoot(Setpoint goal) {
@@ -119,12 +132,16 @@ public class Shooter extends SubsystemBase {
                                 .andThen(new WaitCommand(ShooterConstants.shootingTime))));
     }
 
+    public Command shoot(Setpoints goal) {
+        return defer(() -> shoot(goal.getSetpoint()));
+    }
+
     public Command goToLoadingSetpoint() {
-        return goToAngle(Setpoints.Load.getSetpoint());
+        return goToAngle(Setpoints.Load);
     }
 
     public Command loadCoral() {
-        return goToAngle(Setpoints.Load.getSetpoint())
+        return defer(() -> goToAngle(Setpoints.Load.getSetpoint())
                 .andThen(startEnd(
                                 () -> {
                                     io.setFeederSpeed(ShooterConstants.feederSpeedLoading);
@@ -132,7 +149,8 @@ public class Shooter extends SubsystemBase {
                                 () -> {
                                     io.setFeederSpeed(0);
                                 })
-                        .until(() -> !this.getBeambreak()));
+                        .withDeadline(Commands.waitUntil(() -> !this.getBeambreak()))
+                        .andThen(Commands.waitTime(Seconds.of(0.2)))));
     }
 
     @AutoLogOutput(key = "Shooter/beambreak")
