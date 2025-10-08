@@ -6,14 +6,13 @@ import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
+import edu.wpi.first.units.measure.Time;
 import edu.wpi.first.units.measure.Voltage;
-import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.Timer;
 import frc.robot.util.TalonFXUtil.MotorInputs;
 import java.util.function.BooleanSupplier;
 
 public class ShooterIOSim implements ShooterIO {
-
-    private final DigitalInput beambreak = new DigitalInput(ShooterConstants.beambreakId);
 
     private final BooleanSupplier obtainGamePiece;
 
@@ -63,12 +62,25 @@ public class ShooterIOSim implements ShooterIO {
 
     Angle currentAngle = Degrees.zero();
 
+    Timer timeToPassthroughTimer = new Timer();
+    Time timeToPassthrough = Seconds.of(1.5);
+    boolean passthroughActive = false;
+
     @Override
     public void updateInputs(ShooterIOInputs inputs) {
         // maplesim stuff
-        if (feederSpeed.in(Volts) > 0 && !hasCoral) {
-            hasCoral = obtainGamePiece.getAsBoolean();
+        if (feederSpeed.in(Volts) > 0 && !hasCoral && !passthroughActive) {
+            passthroughActive = obtainGamePiece.getAsBoolean();
+            timeToPassthroughTimer.restart();
+        } else if (feederSpeed.in(Volts) > 0 && hasCoral && bottomShooterSpeed.in(DegreesPerSecond) != 0) {
+            hasCoral = false;
         }
+
+        if (passthroughActive && timeToPassthroughTimer.hasElapsed(timeToPassthrough.in(Seconds))) {
+            hasCoral = true;
+            passthroughActive = false;
+        }
+
         inputs.beambreak = !hasCoral;
 
         // run the fake PID controller to simulate the pivot motor and simulator
@@ -81,8 +93,7 @@ public class ShooterIOSim implements ShooterIO {
         inputs.bottomRightMotorConnected = true;
         inputs.topMotorConnected = true;
         inputs.feederMotorConnected = true;
-        inputs.pivotLeftMotorConnected = true;
-        inputs.pivotRightMotorConnected = true;
+        inputs.pivotMotorConnected = true;
 
         // simulate delay in responsiveness of the flywheels using the SlewRateLimiter
         AngularVelocity bottomShooterMeasuredSpeed = RotationsPerSecond.of(
@@ -97,8 +108,7 @@ public class ShooterIOSim implements ShooterIO {
 
         inputs.topMotorInputs =
                 new MotorInputs(0.0, topShooterMeasuredSpeed.in(RadiansPerSecond), 0.0, 0.0, 0.0, 0.0, false);
-        inputs.pivotRightMotorInputs = new MotorInputs(currentAngle.in(Radians), 0.0, 0.0, 0.0, 0.0, 0.0, false);
-        inputs.pivotLeftMotorInputs = new MotorInputs(currentAngle.in(Radians), 0.0, 0.0, 0.0, 0.0, 0.0, false);
+        inputs.pivotMotorInputs = new MotorInputs(currentAngle.in(Radians), 0.0, 0.0, 0.0, 0.0, 0.0, false);
         inputs.feederMotorInputs = new MotorInputs(0.0, 0.0, feederSpeed.in(Volts), 0.0, 0.0, 0.0, false);
     }
 }

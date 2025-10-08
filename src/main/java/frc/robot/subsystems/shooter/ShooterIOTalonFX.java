@@ -21,8 +21,7 @@ public class ShooterIOTalonFX implements ShooterIO {
     private final MotorStatusSignalSet bottomRightSignals;
     private final MotorStatusSignalSet topSignals;
     private final MotorStatusSignalSet feederSignals;
-    private final MotorStatusSignalSet pivotLeftSignals;
-    private final MotorStatusSignalSet pivotRightSignals;
+    private final MotorStatusSignalSet pivotSignals;
 
     // Declare motor controllers
     private final TalonFX talonBottomLeft =
@@ -44,8 +43,7 @@ public class ShooterIOTalonFX implements ShooterIO {
         bottomRightSignals = new MotorStatusSignalSet(talonBottomRight, "Bottom Right", "Shooter");
         topSignals = new MotorStatusSignalSet(talonTop, "Top", "Shooter");
         feederSignals = new MotorStatusSignalSet(talonFeeder, "Feeder", "Shooter");
-        pivotLeftSignals = new MotorStatusSignalSet(talonPivotLeft, "Pivot Left", "Shooter");
-        pivotRightSignals = new MotorStatusSignalSet(talonPivotRight, "Pivot Right", "Shooter");
+        pivotSignals = new MotorStatusSignalSet(talonPivotLeft, "Pivot", "Shooter");
 
         tryUntilOk(
                 5,
@@ -56,8 +54,7 @@ public class ShooterIOTalonFX implements ShooterIO {
                                         bottomRightSignals.getBaseStatusSignals(),
                                         topSignals.getBaseStatusSignals(),
                                         feederSignals.getBaseStatusSignals(),
-                                        pivotLeftSignals.getBaseStatusSignals(),
-                                        pivotRightSignals
+                                        pivotSignals
                                                 .getBaseStatusSignals()) // set the update frequency off all the signals
                                 .flatMap(Arrays::stream)
                                 .toArray(BaseStatusSignal[]::new)));
@@ -88,26 +85,22 @@ public class ShooterIOTalonFX implements ShooterIO {
                 .isOK();
         inputs.feederMotorConnected = BaseStatusSignal.refreshAll(feederSignals.getBaseStatusSignals())
                 .isOK();
-        inputs.pivotLeftMotorConnected = BaseStatusSignal.refreshAll(pivotLeftSignals.getBaseStatusSignals())
-                .isOK();
-        inputs.pivotRightMotorConnected = BaseStatusSignal.refreshAll(pivotRightSignals.getBaseStatusSignals())
-                .isOK();
+        inputs.pivotMotorConnected =
+                BaseStatusSignal.refreshAll(pivotSignals.getBaseStatusSignals()).isOK();
 
         // Update the connected alerts based on motor connection status
         topSignals.setConnected(inputs.topMotorConnected);
         bottomLeftSignals.setConnected(inputs.bottomLeftMotorConnected);
         bottomRightSignals.setConnected(inputs.bottomRightMotorConnected);
         feederSignals.setConnected(inputs.feederMotorConnected);
-        pivotLeftSignals.setConnected(inputs.pivotLeftMotorConnected);
-        pivotRightSignals.setConnected(inputs.pivotRightMotorConnected);
+        pivotSignals.setConnected(inputs.pivotMotorConnected);
 
         // Update the inputs with the latest values from the signals
         inputs.topMotorInputs = topSignals.getMotorInputs();
         inputs.bottomLeftMotorInputs = bottomLeftSignals.getMotorInputs();
         inputs.bottomRightMotorInputs = bottomRightSignals.getMotorInputs();
         inputs.feederMotorInputs = feederSignals.getMotorInputs();
-        inputs.pivotLeftMotorInputs = pivotLeftSignals.getMotorInputs();
-        inputs.pivotRightMotorInputs = pivotRightSignals.getMotorInputs();
+        inputs.pivotMotorInputs = pivotSignals.getMotorInputs();
 
         inputs.beambreak = beambreak.get();
     }
