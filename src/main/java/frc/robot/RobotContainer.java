@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.autos.AutopilotAutos;
 import frc.robot.commands.AutoScoreCommand;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.FeederCommands;
@@ -148,6 +149,8 @@ public class RobotContainer {
 
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+
+        autoChooser.addOption("Basic L4", AutopilotAutos.BasicL4(drive, shooter));
 
         // Set up SysId routines
         autoChooser.addOption("Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
