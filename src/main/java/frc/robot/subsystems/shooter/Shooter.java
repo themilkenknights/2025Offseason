@@ -54,12 +54,11 @@ public class Shooter extends SubsystemBase {
 
     @AutoLogOutput(key = "Shooter/atSetpoint")
     public boolean atPivotSetpoint() {
-        return Radians.of(inputs.pivotLeftMotorInputs.positionRads())
-                .isNear(goalAngle, ShooterConstants.pivotTolerance);
+        return Radians.of(inputs.pivotMotorInputs.positionRads()).isNear(goalAngle, ShooterConstants.pivotTolerance);
     }
 
     public Angle getPivotAngle() {
-        return Radians.of(-inputs.pivotLeftMotorInputs.positionRads());
+        return Radians.of(-inputs.pivotMotorInputs.positionRads());
     }
 
     @AutoLogOutput(key = "Shooter/topRollerAtSetpoint")
@@ -133,7 +132,7 @@ public class Shooter extends SubsystemBase {
                                 () -> {
                                     io.setFeederSpeed(0);
                                 })
-                        .until(this::getBeambreak));
+                        .until(() -> !this.getBeambreak()));
     }
 
     @AutoLogOutput(key = "Shooter/beambreak")

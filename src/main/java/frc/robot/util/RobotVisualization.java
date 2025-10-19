@@ -13,11 +13,15 @@ import org.littletonrobotics.junction.Logger;
 public class RobotVisualization extends SubsystemBase {
 
     public static final Translation3d zeroedPivotTranslation =
-            new Translation3d(Inches.of(-1), Meters.zero(), Inches.of(12.75));
+            new Translation3d(Inches.of(5.000000), Inches.of(0.440945), Inches.of(10.75));
+    public static final Translation3d zeroedIntakeTranslation =
+            new Translation3d(Inches.of(-10.000000), Inches.zero(), Inches.of(6.75));
+    public Supplier<Angle> intakeAngle;
     public Supplier<Angle> pivotAngle;
 
-    public RobotVisualization(Supplier<Angle> pivotAngle) {
+    public RobotVisualization(Supplier<Angle> pivotAngle, Supplier<Angle> intakeAngle) {
         this.pivotAngle = pivotAngle;
+        this.intakeAngle = intakeAngle;
     }
 
     @Override
@@ -26,7 +30,9 @@ public class RobotVisualization extends SubsystemBase {
         // Logger.recordOutput("RobotVisualization/zeroPose", new Pose2d());
         Logger.recordOutput("RobotVisualization/Components", new Pose3d[] {
             new Pose3d(
-                    zeroedPivotTranslation, new Rotation3d(0, pivotAngle.get().in(Radian), 0))
+                    zeroedPivotTranslation, new Rotation3d(0, pivotAngle.get().in(Radian), 0)),
+            new Pose3d(
+                    zeroedIntakeTranslation, new Rotation3d(0, intakeAngle.get().in(Radian), 0))
         });
     }
 }

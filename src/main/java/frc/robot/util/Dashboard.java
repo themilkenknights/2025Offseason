@@ -76,6 +76,7 @@ public class Dashboard extends SubsystemBase {
             poseChooser.addOption(pos.name(), pos);
         }
         poseChooser.addDefaultOption(reefPosition.A.toString(), reefPosition.A);
+        levelChooser.addDefaultOption(Level.L4.toString(), Level.L4);
     }
 
     @Override

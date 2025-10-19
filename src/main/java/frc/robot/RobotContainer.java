@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import frc.robot.autos.AutopilotAutos;
 import frc.robot.commands.AutoScoreCommand;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.FeederCommands;
@@ -92,10 +93,7 @@ public class RobotContainer {
                         new ModuleIOTalonFXReal(TunerConstants.BackLeft),
                         new ModuleIOTalonFXReal(TunerConstants.BackRight),
                         (pose) -> {});
-                this.vision = new Vision(
-                        drive,
-                        new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation),
-                        new VisionIOLimelight(VisionConstants.camera1Name, drive::getRotation));
+                this.vision = new Vision(drive, new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation));
                 shooter = new Shooter(new ShooterIOTalonFX());
                 intake = new Intake(new IntakeIOTalonFX());
                 objectDetection = new ObjectDetection(
@@ -120,9 +118,7 @@ public class RobotContainer {
                 vision = new Vision(
                         drive,
                         new VisionIOPhotonVisionSim(
-                                camera0Name, robotToCamera0, driveSimulation::getSimulatedDriveTrainPose),
-                        new VisionIOPhotonVisionSim(
-                                camera1Name, robotToCamera1, driveSimulation::getSimulatedDriveTrainPose));
+                                camera0Name, robotToCamera0, driveSimulation::getSimulatedDriveTrainPose));
 
                 IntakeIOSim intakeIOSim = new IntakeIOSim(driveSimulation);
                 intake = new Intake(intakeIOSim);
@@ -140,19 +136,21 @@ public class RobotContainer {
                         new ModuleIO() {},
                         new ModuleIO() {},
                         (pose) -> {});
-                vision = new Vision(drive, new VisionIO() {}, new VisionIO() {});
+                vision = new Vision(drive, new VisionIO() {});
                 shooter = new Shooter(new ShooterIO() {});
                 intake = new Intake(new IntakeIO() {});
                 objectDetection = new ObjectDetection(new ObjectDetectionIO() {});
                 break;
         }
         // set up robot visualization
-        robotVisualization = new RobotVisualization(shooter::getPivotAngle);
+        robotVisualization = new RobotVisualization(shooter::getPivotAngle, intake::getCurrentAngle);
         // set up dashboard
         dashboard = new Dashboard(drive::getPose);
 
         // Set up auto routines
         autoChooser = new LoggedDashboardChooser<>("Auto Choices", AutoBuilder.buildAutoChooser());
+
+        autoChooser.addOption("Basic L4", AutopilotAutos.BasicL4(drive, shooter));
 
         // Set up SysId routines
         autoChooser.addOption("Drive Wheel Radius Characterization", DriveCommands.wheelRadiusCharacterization(drive));
@@ -208,7 +206,8 @@ public class RobotContainer {
         driverController
                 .leftBumper()
                 .whileTrue(ObjectDetectionDriveCommands.autoIntake(
-                        drive, intake, objectDetection::getBestTarget, objectDetection::hasTarget));
+                                drive, intake, objectDetection::getBestTarget, objectDetection::hasTarget)
+                        .andThen(FeederCommands.feed(intake, shooter)));
         driverController
                 .rightTrigger()
                 .whileTrue(Commands.deferredProxy(

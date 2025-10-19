@@ -23,9 +23,9 @@ public class AutoPilotDriveCommands {
     // Autopilot constants
     private static final APConstraints constraints = new APConstraints(10, 10);
     private static final APProfile profile = new APProfile(constraints)
-            .withErrorXY(Centimeters.of(3))
+            .withErrorXY(Inches.of(1))
             .withErrorTheta(Degrees.of(0.5))
-            .withBeelineRadius(Centimeters.of(16));
+            .withBeelineRadius(Inches.of(16));
     private static final Autopilot autopilot = new Autopilot(profile);
 
     private AutoPilotDriveCommands() {
@@ -35,7 +35,7 @@ public class AutoPilotDriveCommands {
     public static Command autopilotGoToShootFromPose(Drive drive, reefPosition position) {
         return autopilotDriveCommand(
                 new APTarget(Dashboard.getPoseFromReefPosition(position))
-                        .withEntryAngle(drive.getPose().getRotation()),
+                        .withEntryAngle(drive.getPose().getRotation()), // TODO:might need to change by alliance
                 drive);
     }
 
@@ -82,6 +82,6 @@ public class AutoPilotDriveCommands {
                 })
                 .until(() -> autopilot.atTarget(drive.getPose(), goal))
                 .beforeStarting(() -> angleController.reset(drive.getRotation().getRadians()))
-                .andThen(() -> drive.stop());
+                .andThen(() -> drive.runVelocity(new ChassisSpeeds()));
     }
 }

@@ -8,6 +8,7 @@ import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.units.measure.*;
 import frc.robot.util.Dashboard.Level;
@@ -39,7 +40,8 @@ public class ShooterConstants {
     public static final SlewRateLimiter topWheelLimiter = new SlewRateLimiter(6000); // for sim
 
     public static enum Setpoints {
-        Load(new Setpoint(Degrees.of(30), RotationsPerSecond.of(0), RotationsPerSecond.of(0))),
+        Load(new Setpoint(
+                Degrees.of(15), RotationsPerSecond.of(0), RotationsPerSecond.of(0))), // negate what it should be in cad
         L1(new Setpoint(Degrees.of(40), RotationsPerSecond.of(1000), RotationsPerSecond.of(1500))),
         L2(new Setpoint(Degrees.of(50), RotationsPerSecond.of(50), RotationsPerSecond.of(2000))),
         L3(new Setpoint(Degrees.of(60), RotationsPerSecond.of(1500), RotationsPerSecond.of(3000))),
@@ -95,7 +97,10 @@ public class ShooterConstants {
                         .withStatorCurrentLimitEnable(true)
                         .withSupplyCurrentLimit(40)
                         .withSupplyCurrentLimitEnable(true))
-                .withFeedback(new FeedbackConfigs().withSensorToMechanismRatio(100.0))
+                .withFeedback(new FeedbackConfigs()
+                        .withSensorToMechanismRatio(1)
+                        .withFeedbackSensorSource(FeedbackSensorSourceValue.FusedCANcoder)
+                        .withRotorToSensorRatio(75))
                 .withSlot0(new Slot0Configs()
                         .withKP(12)
                         .withKD(0)

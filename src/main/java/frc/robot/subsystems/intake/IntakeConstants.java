@@ -7,6 +7,7 @@ import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import edu.wpi.first.units.measure.*;
 
 public class IntakeConstants {
@@ -21,11 +22,11 @@ public class IntakeConstants {
     public static final double intakeingVoltage = 12;
     public static final double feedingVoltage = -12;
 
-    public static final Angle pivotStowedAngle = Degrees.of(0); // TODO: make actual values
+    public static final Angle pivotStowedAngle = Degrees.of(90); // TODO: make actual values
 
-    public static final Angle pivotExtendedAngle = Degrees.of(90);
+    public static final Angle pivotExtendedAngle = Degrees.of(0);
 
-    public static final Angle pivotFeedingAngle = Degrees.of(45);
+    public static final Angle pivotFeedingAngle = Degrees.of(160);
 
     public static final Angle pivotTolerance = Degrees.of(1);
 
@@ -43,7 +44,10 @@ public class IntakeConstants {
                         .withStatorCurrentLimitEnable(true)
                         .withSupplyCurrentLimit(30)
                         .withSupplyCurrentLimitEnable(true))
-                .withFeedback(new FeedbackConfigs().withSensorToMechanismRatio(50.0))
+                .withFeedback(new FeedbackConfigs()
+                        .withSensorToMechanismRatio(1)
+                        .withFeedbackSensorSource(FeedbackSensorSourceValue.FusedCANcoder)
+                        .withSensorToMechanismRatio(20))
                 .withSlot0(new Slot0Configs()
                         .withKP(10)
                         .withKD(0)
