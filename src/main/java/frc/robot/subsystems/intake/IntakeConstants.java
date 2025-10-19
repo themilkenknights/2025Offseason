@@ -10,6 +10,8 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import edu.wpi.first.units.measure.*;
 import frc.robot.Constants;
+import frc.robot.util.Tuning.TunedWait;
+
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class IntakeConstants {
@@ -23,6 +25,8 @@ public class IntakeConstants {
 
     public static final double intakeingVoltage = 12;
     public static final double feedingVoltage = -12;
+
+    public static final TunedWait postIntakeDelay = new TunedWait(Seconds.of(0.2), "Intake", "postIntakeDelay");
 
     private static final Angle pivotStowedAngle = Degrees.of(90);
     private static final Angle pivotExtendedAngle = Degrees.of(0);

@@ -2,6 +2,8 @@ package frc.robot.subsystems.shooter;
 
 import static edu.wpi.first.units.Units.*;
 
+import java.util.Set;
+
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -150,7 +152,7 @@ public class Shooter extends SubsystemBase {
                                     io.setFeederSpeed(0);
                                 })
                         .withDeadline(Commands.waitUntil(() -> !this.getBeambreak()))
-                        .andThen(Commands.waitTime(Seconds.of(0.2)))));
+                        .andThen(ShooterConstants.passthroughWait.getWaitCommand())));
     }
 
     @AutoLogOutput(key = "Shooter/beambreak")

@@ -60,7 +60,7 @@ public class Intake extends SubsystemBase {
                                     io.setFrontRollerSpeed(0);
                                     io.setIndexerSpeed(0);
                                 })
-                        .until(() -> !inputs.beambreak));
+                        .until(() -> !inputs.beambreak)).andThen(IntakeConstants.postIntakeDelay.getWaitCommand());
     }
 
     /**

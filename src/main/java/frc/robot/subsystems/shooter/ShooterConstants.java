@@ -13,6 +13,8 @@ import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.units.measure.*;
 import frc.robot.Constants;
 import frc.robot.util.Dashboard.Level;
+import frc.robot.util.Tuning.TunedWait;
+
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class ShooterConstants {
@@ -41,16 +43,10 @@ public class ShooterConstants {
     public static final SlewRateLimiter bottomWheelLimiter = new SlewRateLimiter(6000); // Rps
     public static final SlewRateLimiter topWheelLimiter = new SlewRateLimiter(6000); // for sim
 
-    private static final double defaultPassthroughWaitTimeSeconds = 0.2;
+    public static final TunedWait passthroughWait = new TunedWait(Seconds.of(0.2),"Shooter","passthroughWait");
 
-    private static final LoggedNetworkNumber passthroughWaitTimeSeconds =
-            new LoggedNetworkNumber("/Tuning/Shooter/PassthroughWaitTimeSeconds", defaultPassthroughWaitTimeSeconds);
 
-    public static Time getPassthroughWaitTime() {
-        return Constants.enableNTTuning
-                ? Seconds.of(passthroughWaitTimeSeconds.get())
-                : Seconds.of(defaultPassthroughWaitTimeSeconds);
-    }
+    
 
     public static enum Setpoints {
         Load(new Setpoint(

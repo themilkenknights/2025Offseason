@@ -42,6 +42,7 @@ public class ObjectDetectionDriveCommands {
                                     new ChassisSpeeds(0, 0, pid.calculate(getCenterX(target.get()), 640 / 2)));
                         })
                         .until(pid::atSetpoint));
+               
     }
 
     private static final double m = 0.015 / -640;
@@ -50,7 +51,6 @@ public class ObjectDetectionDriveCommands {
 
         return (m * y) + 0.02;
     }
-
     public static Command autoIntake(
             Drive drive, Intake intake, Supplier<PhotonTrackedTarget> target, BooleanSupplier hasTarget) {
         PIDController pid = new PIDController(CENTER_TARGET_P, CENTER_TARGET_I, CENTER_TARGET_D);
@@ -62,5 +62,7 @@ public class ObjectDetectionDriveCommands {
                                     new ChassisSpeeds(-0.5, 0, pid.calculate(getCenterX(target.get()), 640 / 2)));
                         })
                         .withDeadline(intake.intakeCoral()));
+               
     }
-}
+    }
+
