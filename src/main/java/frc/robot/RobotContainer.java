@@ -202,7 +202,7 @@ public class RobotContainer {
 
         // testing the intake
         driverController.leftTrigger().onTrue(intake.intakeCoral().andThen(FeederCommands.feed(intake, shooter)));
-        driverController.rightBumper().onTrue(shooter.shoot(ShooterConstants.Setpoints.L4.getSetpoint()));
+        driverController.rightBumper().onTrue(shooter.shoot(ShooterConstants.Setpoints.L4));
         driverController
                 .leftBumper()
                 .whileTrue(ObjectDetectionDriveCommands.autoIntake(
