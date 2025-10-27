@@ -25,10 +25,8 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import frc.robot.autos.AutopilotAutos;
-import frc.robot.commands.AutoScoreCommand;
 import frc.robot.commands.DriveCommands;
 import frc.robot.commands.FeederCommands;
-import frc.robot.commands.ObjectDetectionDriveCommands;
 import frc.robot.generated.TunerConstants;
 import frc.robot.subsystems.drive.*;
 import frc.robot.subsystems.intake.Intake;
@@ -86,12 +84,19 @@ public class RobotContainer {
         switch (Constants.currentMode) {
             case REAL:
                 // Real robot, instantiate hardware IO implementations
+                // drive = new Drive(
+                //         new GyroIOPigeon2(),
+                //         new ModuleIOTalonFXReal(TunerConstants.FrontLeft),
+                //         new ModuleIOTalonFXReal(TunerConstants.FrontRight),
+                //         new ModuleIOTalonFXReal(TunerConstants.BackLeft),
+                //         new ModuleIOTalonFXReal(TunerConstants.BackRight),
+                //         (pose) -> {});
                 drive = new Drive(
-                        new GyroIOPigeon2(),
-                        new ModuleIOTalonFXReal(TunerConstants.FrontLeft),
-                        new ModuleIOTalonFXReal(TunerConstants.FrontRight),
-                        new ModuleIOTalonFXReal(TunerConstants.BackLeft),
-                        new ModuleIOTalonFXReal(TunerConstants.BackRight),
+                        new GyroIO() {},
+                        new ModuleIO() {},
+                        new ModuleIO() {},
+                        new ModuleIO() {},
+                        new ModuleIO() {},
                         (pose) -> {});
                 this.vision = new Vision(drive, new VisionIOLimelight(VisionConstants.camera0Name, drive::getRotation));
                 shooter = new Shooter(new ShooterIOTalonFX());
@@ -203,15 +208,19 @@ public class RobotContainer {
         // testing the intake
         driverController.leftTrigger().onTrue(intake.intakeCoral().andThen(FeederCommands.feed(intake, shooter)));
         driverController.rightBumper().onTrue(shooter.shoot(ShooterConstants.Setpoints.L4));
-        driverController
-                .leftBumper()
-                .whileTrue(ObjectDetectionDriveCommands.autoIntake(
-                                drive, intake, objectDetection::getBestTarget, objectDetection::hasTarget)
-                        .andThen(FeederCommands.feed(intake, shooter)));
-        driverController
-                .rightTrigger()
-                .whileTrue(Commands.deferredProxy(
-                        () -> AutoScoreCommand.AutoScore(Dashboard.getSelectedTarget(), drive, shooter)));
+
+        driverController.leftBumper().onTrue(intake.stow());
+
+        // driverController
+        //         .leftBumper()
+        //         .whileTrue(ObjectDetectionDriveCommands.autoIntake(
+        //                         drive, intake, objectDetection::getBestTarget, objectDetection::hasTarget)
+        //                 .andThen(FeederCommands.feed(intake, shooter)));
+
+        // driverController
+        //         .rightTrigger()
+        //         .whileTrue(Commands.deferredProxy(
+        //                 () -> AutoScoreCommand.AutoScore(Dashboard.getSelectedTarget(), drive, shooter)));
     }
 
     /**

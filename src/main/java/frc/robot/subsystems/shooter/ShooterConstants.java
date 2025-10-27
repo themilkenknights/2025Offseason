@@ -14,7 +14,6 @@ import edu.wpi.first.units.measure.*;
 import frc.robot.Constants;
 import frc.robot.util.Dashboard.Level;
 import frc.robot.util.Tuning.TunedWait;
-
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class ShooterConstants {
@@ -43,10 +42,7 @@ public class ShooterConstants {
     public static final SlewRateLimiter bottomWheelLimiter = new SlewRateLimiter(6000); // Rps
     public static final SlewRateLimiter topWheelLimiter = new SlewRateLimiter(6000); // for sim
 
-    public static final TunedWait passthroughWait = new TunedWait(Seconds.of(0.2),"Shooter","passthroughWait");
-
-
-    
+    public static final TunedWait passthroughWait = new TunedWait(Seconds.of(0.2), "Shooter", "passthroughWait");
 
     public static enum Setpoints {
         Load(new Setpoint(
@@ -110,14 +106,14 @@ public class ShooterConstants {
                         .withKV(0)
                         .withKA(0));
 
-        TalonFXConfiguration feederMotor = new TalonFXConfiguration()
+        static TalonFXConfiguration feederMotor = new TalonFXConfiguration()
                 .withCurrentLimits(new CurrentLimitsConfigs()
                         .withStatorCurrentLimit(60)
                         .withStatorCurrentLimitEnable(true)
                         .withSupplyCurrentLimit(40)
                         .withSupplyCurrentLimitEnable(true));
 
-        TalonFXConfiguration angleMotor = new TalonFXConfiguration()
+        static TalonFXConfiguration angleMotor = new TalonFXConfiguration()
                 .withCurrentLimits(new CurrentLimitsConfigs()
                         .withStatorCurrentLimit(60)
                         .withStatorCurrentLimitEnable(true)
@@ -125,7 +121,9 @@ public class ShooterConstants {
                         .withSupplyCurrentLimitEnable(true))
                 .withFeedback(new FeedbackConfigs()
                         .withSensorToMechanismRatio(1)
-                        .withFeedbackSensorSource(FeedbackSensorSourceValue.FusedCANcoder)
+                        .withFeedbackSensorSource(FeedbackSensorSourceValue.RemoteCANcoder)
+                        .withRotorToSensorRatio(75)
+                        .withFeedbackRemoteSensorID(18)
                         .withRotorToSensorRatio(75))
                 .withSlot0(new Slot0Configs()
                         .withKP(12)
@@ -134,8 +132,8 @@ public class ShooterConstants {
                         .withKV(0)
                         .withKA(0))
                 .withMotionMagic(new MotionMagicConfigs()
-                        .withMotionMagicCruiseVelocity(1)
-                        .withMotionMagicAcceleration(1)
-                        .withMotionMagicJerk(1));
+                        .withMotionMagicCruiseVelocity(10)
+                        .withMotionMagicAcceleration(10)
+                        .withMotionMagicJerk(10));
     }
 }

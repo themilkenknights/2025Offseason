@@ -4,10 +4,12 @@ import static edu.wpi.first.units.Units.*;
 import static frc.robot.util.PhoenixUtil.tryUntilOk;
 
 import com.ctre.phoenix6.BaseStatusSignal;
+import com.ctre.phoenix6.configs.MotorOutputConfigs;
 import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.controls.VoltageOut;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.InvertedValue;
 import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -32,8 +34,8 @@ public class ShooterIOTalonFX implements ShooterIO {
     private final TalonFX talonFeeder = new TalonFX(ShooterConstants.feederMotorId, ShooterConstants.shooterCANBus);
     private final TalonFX talonPivotLeft =
             new TalonFX(ShooterConstants.pivotLeftMotorId, ShooterConstants.shooterCANBus);
-    private final TalonFX talonPivotRight =
-            new TalonFX(ShooterConstants.pivotRightMotorId, ShooterConstants.shooterCANBus);
+    //     private final TalonFX talonPivotRight =
+    //             new TalonFX(ShooterConstants.pivotRightMotorId, ShooterConstants.shooterCANBus);
 
     private final DigitalInput beambreak = new DigitalInput(ShooterConstants.beambreakId);
 
@@ -63,15 +65,20 @@ public class ShooterIOTalonFX implements ShooterIO {
         tryUntilOk(5, () -> talonTop.optimizeBusUtilization(0, 1.0));
         tryUntilOk(5, () -> talonFeeder.optimizeBusUtilization(0, 1.0));
         tryUntilOk(5, () -> talonPivotLeft.optimizeBusUtilization(0, 1.0));
-        tryUntilOk(5, () -> talonPivotRight.optimizeBusUtilization(0, 1.0));
+        // tryUntilOk(5, () -> talonPivotRight.optimizeBusUtilization(0, 1.0));
 
         // apply the configurations
         tryUntilOk(5, () -> talonBottomLeft.getConfigurator().apply(motorConfigs.shooterMotorConfigs));
-        tryUntilOk(5, () -> talonBottomRight.getConfigurator().apply(motorConfigs.shooterMotorConfigs));
-        tryUntilOk(5, () -> talonTop.getConfigurator().apply(motorConfigs.shooterMotorConfigs));
-        tryUntilOk(5, () -> talonFeeder.getConfigurator().apply(motorConfigs.shooterMotorConfigs));
-        tryUntilOk(5, () -> talonPivotLeft.getConfigurator().apply(motorConfigs.shooterMotorConfigs));
-        tryUntilOk(5, () -> talonPivotRight.getConfigurator().apply(motorConfigs.shooterMotorConfigs));
+        tryUntilOk(5, () -> talonBottomRight
+                .getConfigurator()
+                .apply(motorConfigs.shooterMotorConfigs.withMotorOutput(
+                        new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive))));
+        tryUntilOk(5, () -> talonTop.getConfigurator()
+                .apply(motorConfigs.shooterMotorConfigs.withMotorOutput(
+                        new MotorOutputConfigs().withInverted(InvertedValue.CounterClockwise_Positive))));
+        tryUntilOk(5, () -> talonFeeder.getConfigurator().apply(motorConfigs.feederMotor));
+        tryUntilOk(5, () -> talonPivotLeft.getConfigurator().apply(motorConfigs.angleMotor));
+        // tryUntilOk(5, () -> talonPivotRight.getConfigurator().apply(motorConfigs.shooterMotorConfigs));
     }
 
     @Override
@@ -126,7 +133,7 @@ public class ShooterIOTalonFX implements ShooterIO {
     @Override
     public void setTargetAngle(Angle angle) {
         talonPivotLeft.setControl(pivotControlRequest.withPosition(angle));
-        talonPivotRight.setControl(pivotControlRequest.withPosition(angle));
+        // talonPivotRight.setControl(pivotControlRequest.withPosition(angle));
     }
 
     private final VelocityVoltage topShooterRequest = new VelocityVoltage(0).withSlot(0);

@@ -5,13 +5,13 @@ import static edu.wpi.first.units.Units.*;
 import com.ctre.phoenix6.CANBus;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
 import com.ctre.phoenix6.configs.FeedbackConfigs;
+import com.ctre.phoenix6.configs.MotionMagicConfigs;
 import com.ctre.phoenix6.configs.Slot0Configs;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import edu.wpi.first.units.measure.*;
 import frc.robot.Constants;
 import frc.robot.util.Tuning.TunedWait;
-
 import org.littletonrobotics.junction.networktables.LoggedNetworkNumber;
 
 public class IntakeConstants {
@@ -76,13 +76,16 @@ public class IntakeConstants {
                 .withFeedback(new FeedbackConfigs()
                         .withSensorToMechanismRatio(1)
                         .withFeedbackSensorSource(FeedbackSensorSourceValue.FusedCANcoder)
-                        .withSensorToMechanismRatio(20))
+                        .withRotorToSensorRatio(40)
+                        .withFeedbackRemoteSensorID(34))
                 .withSlot0(new Slot0Configs()
                         .withKP(10)
                         .withKD(0)
                         .withKS(0)
                         .withKV(0)
-                        .withKA(0));
+                        .withKA(0))
+                .withMotionMagic(
+                        new MotionMagicConfigs().withMotionMagicAcceleration(10).withMotionMagicCruiseVelocity(10));
 
         public static final TalonFXConfiguration frontRollerMotor = new TalonFXConfiguration()
                 .withCurrentLimits(new CurrentLimitsConfigs()
